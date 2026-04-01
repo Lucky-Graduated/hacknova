@@ -725,6 +725,39 @@ def sector_summary(metrics_df: pd.DataFrame):
     df = metrics_df.copy()
     df["Sector"] = df["Sector"]
 
+    # ── Generate Sector Averages CSV ──────────────────────────────────────────
+    sector_avg = []
+    for sector in ["Banking", "IT", "Pharma"]:
+        sector_data = df[df["Sector"] == sector]
+        avg_row = {
+            "Sector": sector,
+            "Count": len(sector_data),
+            "Avg Return (%)": round(sector_data["Ann. Return (%)"].mean(), 2),
+            "Avg Volatility (%)": round(sector_data["Ann. Volatility (%)"].mean(), 2),
+            "Avg Sharpe": round(sector_data["Sharpe Ratio"].mean(), 2),
+            "Avg Beta": round(sector_data["Beta"].mean(), 2),
+            "Avg Max Drawdown (%)": round(sector_data["Max Drawdown (%)"].mean(), 2),
+        }
+        sector_avg.append(avg_row)
+
+    # Overall average
+    overall_row = {
+        "Sector": "Overall",
+        "Count": len(df),
+        "Avg Return (%)": round(df["Ann. Return (%)"].mean(), 2),
+        "Avg Volatility (%)": round(df["Ann. Volatility (%)"].mean(), 2),
+        "Avg Sharpe": round(df["Sharpe Ratio"].mean(), 2),
+        "Avg Beta": round(df["Beta"].mean(), 2),
+        "Avg Max Drawdown (%)": round(df["Max Drawdown (%)"].mean(), 2),
+    }
+    sector_avg.append(overall_row)
+
+    sector_avg_df = pd.DataFrame(sector_avg)
+    sector_avg_df.to_csv(f"{OUT}/sector_averages.csv", index=False)
+    print(f"\n  Sector-Level Averages:")
+    print(sector_avg_df.to_string(index=False))
+    print(f"\n  ✔  Saved → sector_averages.csv")
+
     fig, axes = plt.subplots(1, 3, figsize=(16, 6))
     fig.patch.set_facecolor("#0f1117")
     fig.suptitle("Sector-Level Performance Overview (2023–2024)",

@@ -1,0 +1,5 @@
+Sector,Count,Avg Return (%),Avg Volatility (%),Avg Sharpe,Avg Beta,Avg Max Drawdown (%)
+Banking,5,13.64,24.56,0.27,0.63,-30.57
+IT,5,25.01,23.86,0.83,0.70,-24.61
+Pharma,5,40.72,24.25,1.45,0.66,-20.64
+Overall,15,26.46,24.22,0.85,0.66,-25.27
