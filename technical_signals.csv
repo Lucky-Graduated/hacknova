@@ -1,0 +1,16 @@
+Ticker,Sector,SMA50,SMA200,Current Signal,Last Crossover,Crossover Type
+HDFCBANK.NS,Banking,1276.76,1392.55,Death Cross,2024-10-23 00:00:00,Death Cross
+ICICIBANK.NS,Banking,1755.0,1578.27,Golden Cross,N/A,None
+SBIN.NS,Banking,779.15,710.22,Golden Cross,2024-04-12 00:00:00,Golden Cross
+KOTAKBANK.NS,Banking,1787.58,1736.0,Golden Cross,2024-04-19 00:00:00,Golden Cross
+AXISBANK.NS,Banking,1392.43,1248.08,Golden Cross,2024-04-01 00:00:00,Golden Cross
+TCS.NS,IT,4953.21,4938.23,Golden Cross,2024-12-26 00:00:00,Golden Cross
+INFY.NS,IT,2666.44,2869.44,Death Cross,2024-10-25 00:00:00,Death Cross
+WIPRO.NS,IT,831.9,862.05,Death Cross,2024-07-22 00:00:00,Death Cross
+HCLTECH.NS,IT,3103.06,3078.01,Golden Cross,N/A,None
+TECHM.NS,IT,937.15,1098.75,Death Cross,2024-06-11 00:00:00,Death Cross
+SUNPHARMA.NS,Pharma,2772.9,2464.56,Golden Cross,N/A,None
+DRREDDY.NS,Pharma,9759.73,7945.77,Golden Cross,2024-05-23 00:00:00,Golden Cross
+CIPLA.NS,Pharma,2368.29,2110.88,Golden Cross,N/A,None
+DIVISLAB.NS,Pharma,5961.98,5264.61,Golden Cross,2024-05-22 00:00:00,Golden Cross
+APOLLOHOSP.NS,Pharma,9521.18,9324.18,Golden Cross,N/A,None

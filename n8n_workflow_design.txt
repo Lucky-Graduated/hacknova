@@ -1,0 +1,36 @@
+
+=============================================================================
+TASK 5 — n8n WORKFLOW DESIGN (Conceptual — No server required)
+=============================================================================
+
+Workflow: "NSE Stock Price Alert"
+Monitors: HDFCBANK.NS, TCS.NS, SUNPHARMA.NS (1 per sector)
+Trigger : Schedule Node → every 15 min during market hours (09:15–15:30 IST)
+
+Nodes:
+  1. Schedule Trigger
+       Cron: */15 9-15 * * 1-5   (Mon-Fri, every 15 min)
+
+  2. HTTP Request Node  (×3, one per stock)
+       URL: https://query1.finance.yahoo.com/v8/finance/chart/{TICKER}?interval=1d&range=2d
+       Method: GET
+       → Parses JSON → extracts today's close and previous close
+
+  3. Function Node — Compute % Change
+       const prev  = $json.chart.result[0].indicators.quote[0].close[0];
+       const today = $json.chart.result[0].indicators.quote[0].close[1];
+       const pct   = ((today - prev) / prev) * 100;
+       if (Math.abs(pct) > 2) return [{json: {ticker, pct, today, prev}}];
+       return [];
+
+  4. IF Node
+       Condition: items.length > 0  →  alert branch
+
+  5. Send Email / Telegram Node
+       Subject: "⚠ NSE Alert: {{$json.ticker}} moved {{$json.pct}}%"
+       Body   : "Price changed from ₹{{$json.prev}} to ₹{{$json.today}}"
+
+  6. No-op Node (silent branch — no alert needed)
+
+Export the workflow as JSON from n8n and import directly.
+=============================================================================
