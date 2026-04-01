@@ -1,0 +1,270 @@
+{
+  "name": "NSE Stock Price Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/15 9-15 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "0a6930a8-841f-4ebd-995f-22034f1af1ef",
+      "name": "Schedule Every 15min Market Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/HDFCBANK.NS?interval=1d&range=10d",
+        "options": {}
+      },
+      "id": "55fcd5f7-8140-4ac4-a632-89cd666b8bc4",
+      "name": "Fetch HDFCBANK",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/TCS.NS?interval=1d&range=10d",
+        "options": {}
+      },
+      "id": "c39930c0-8240-46de-b851-727ac94f8475",
+      "name": "Fetch TCS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/SUNPHARMA.NS?interval=1d&range=10d",
+        "options": {}
+      },
+      "id": "ad1e351e-1ecf-4c47-80e1-c9c24c3adeb4",
+      "name": "Fetch SUNPHARMA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "bb1a22a9-7d41-414e-a75b-df8c6b7e9bd6",
+      "name": "Merge All Stocks",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        704,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const alerts = [];\n\nfor (const item of items) {\n  try {\n    const ticker = item.json.chart.result[0].meta.symbol;\n    const closes = item.json.chart.result[0].indicators.quote[0].close.filter(c => c !== null);\n    \n    // Skip if insufficient data\n    if (closes.length < 2) continue;\n    \n    // Extract previous close and today's close\n    const prev = closes[closes.length - 2];\n    const today = closes[closes.length - 1];\n    \n    // Calculate percentage change\n    const pct = ((today - prev) / prev) * 100;\n    \n    // Calculate daily returns for volatility\n    const returns = [];\n    for (let i = 1; i < closes.length; i++) {\n      const dailyReturn = (closes[i] - closes[i-1]) / closes[i-1];\n      returns.push(dailyReturn);\n    }\n    \n    // Calculate volatility (standard deviation of returns)\n    const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;\n    const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / returns.length;\n    const volatility = Math.sqrt(variance);\n    \n    // Calculate risk level\n    let riskLevel;\n    if (Math.abs(pct) > 3 || volatility > 0.03) {\n      riskLevel = 'High';\n    } else if (Math.abs(pct) > 1.5 || volatility > 0.015) {\n      riskLevel = 'Medium';\n    } else {\n      riskLevel = 'Low';\n    }\n    \n    // Alert if price change exceeds 2% OR volatility exceeds 0.02\n    if (Math.abs(pct) > 2 || volatility > 0.02) {\n      alerts.push({\n        json: {\n          ticker: ticker,\n          percentChange: pct.toFixed(2),\n          previousClose: prev.toFixed(2),\n          currentPrice: today.toFixed(2),\n          volatility: volatility.toFixed(4),\n          alertReason: Math.abs(pct) > 2 ? 'Price Change' : 'High Volatility',\n          riskLevel: riskLevel\n        }\n      });\n    }\n  } catch (error) {\n    continue;\n  }\n}\n\nreturn alerts;"
+      },
+      "id": "289fc1f6-25fc-47a8-b3d1-8522a9600238",
+      "name": "Calculate Price Changes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $input.all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7531fca1-93db-4917-bb58-fc620cdf7a44",
+      "name": "Check If Alerts Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1152,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "ashishtiwari5611@gmail.com",
+        "subject": "=⚠ NSE Alert: {{ $json.ticker }} moved {{ $json.percentChange }}%",
+        "emailType": "text",
+        "message": "=Stock {{ $json.ticker }} price changed from ₹{{ $json.previousClose }} to ₹{{ $json.currentPrice }}\n\nPercentage Change: {{ $json.percentChange }}%\nVolatility (10-day): {{ $json.volatility }}\nAlert Reason: {{ $json.alertReason }}\nRisk Level: {{ $json.riskLevel }}",
+        "options": {}
+      },
+      "id": "1d04b94a-8d70-4830-854c-017255b201a1",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1376,
+        400
+      ],
+      "webhookId": "48bfcf94-6e71-46db-bc7b-e3b4c7d826fc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pmG3XNXqHxxu3b3y",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "847df869-e950-4f79-9588-e30aa33a2425",
+      "name": "No Alert Needed",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        592
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Every 15min Market Hours": {
+      "main": [
+        [
+          {
+            "node": "Fetch HDFCBANK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch TCS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch SUNPHARMA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch HDFCBANK": {
+      "main": [
+        [
+          {
+            "node": "Merge All Stocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch TCS": {
+      "main": [
+        [
+          {
+            "node": "Merge All Stocks",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch SUNPHARMA": {
+      "main": [
+        [
+          {
+            "node": "Merge All Stocks",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge All Stocks": {
+      "main": [
+        [
+          {
+            "node": "Calculate Price Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Price Changes": {
+      "main": [
+        [
+          {
+            "node": "Check If Alerts Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Alerts Exist": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Alert Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "83a0835a-03cd-4f3f-b89d-43c05f09a064",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "efdc986b886509f3b740ab8c6934f1204b6cc78bb3b8f3e4679262b7f9873eda"
+  },
+  "id": "UcWABr45rF3RBbap",
+  "tags": []
+}
