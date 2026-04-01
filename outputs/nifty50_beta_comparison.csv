@@ -1,0 +1,20 @@
+Ticker,Sector,Beta,Nifty50 Beta,Volatility Relative (%),Risk Classification,Trading Implication
+HDFCBANK.NS,Banking,0.558,1.0,-44.2,Low Risk,Defensive - Hedge against market downturns
+ICICIBANK.NS,Banking,0.507,1.0,-49.3,Low Risk,Most stable - Suitable for conservative investors
+SBIN.NS,Banking,0.712,1.0,-28.8,Moderate Risk,Average market correlation
+KOTAKBANK.NS,Banking,0.619,1.0,-38.1,Low Risk,Below-market volatility
+AXISBANK.NS,Banking,0.689,1.0,-31.1,Moderate Risk,Moderate correlation with Nifty 50
+TCS.NS,IT,0.468,1.0,-53.2,Low Risk,Lowest beta - Most defensive IT stock
+INFY.NS,IT,0.678,1.0,-32.2,Moderate Risk,Close to banking average
+WIPRO.NS,IT,0.851,1.0,-14.9,Moderate-High Risk,High market sensitivity
+HCLTECH.NS,IT,0.706,1.0,-29.4,Moderate Risk,Consistent with IT sector
+TECHM.NS,IT,0.781,1.0,-21.9,Moderate-High Risk,Higher market correlation
+SUNPHARMA.NS,Pharma,0.619,1.0,-38.1,Low Risk,Defensive pharmaceutical
+DRREDDY.NS,Pharma,0.741,1.0,-25.9,Moderate Risk,Higher than pharma average
+CIPLA.NS,Pharma,0.600,1.0,-40.0,Low Risk,Very defensive - Lower volatility
+DIVISLAB.NS,Pharma,0.684,1.0,-31.6,Moderate Risk,Mid-range pharma beta
+APOLLOHOSP.NS,Pharma,0.639,1.0,-36.1,Low Risk,Defensive healthcare
+Banking Avg,Banking,0.633,1.0,-36.3,Low Risk,Sector moves 63% vs market
+IT Avg,IT,0.697,1.0,-30.3,Moderate Risk,Sector moves 70% vs market
+Pharma Avg,Pharma,0.657,1.0,-34.3,Low Risk,Sector moves 66% vs market
+Portfolio Avg,Overall,0.662,1.0,-33.8,Low Risk,All stocks below-market volatility
